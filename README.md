@@ -8,7 +8,11 @@ Use `webpackChunkName` config in vite project as well as `webpack` do.
 
 fork by https://github.com/CaptainLiao/vite-plugin-webpackchunkname
 - [x] 删除nodemodule处理代码
-- [] 添加json文件的的处理
+- [ ] 添加json文件的的处理
+
+发布  
+npm run build  
+npm publish --access=public 
 
 Install the package from npm (or yarn, or pnpm).
 
