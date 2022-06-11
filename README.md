@@ -6,6 +6,10 @@ Use `webpackChunkName` config in vite project as well as `webpack` do.
 
 ## Install
 
+fork by https://github.com/CaptainLiao/vite-plugin-webpackchunkname
+- [x] 删除nodemodule处理代码
+- [] 添加json文件的的处理
+
 Install the package from npm (or yarn, or pnpm).
 
 ```bash

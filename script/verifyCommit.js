@@ -21,6 +21,7 @@ if (!commitRE.test(msg)) {
         `fix(v-model): handle events on blur (close #28)`
       )}\n\n` +
       chalk.red(`  See docs/commit-convention.md for more details.\n`)
+    // 参考 https://github.com/vuejs/core/blob/main/.github/commit-convention.md
   )
   process.exit(1)
 }
