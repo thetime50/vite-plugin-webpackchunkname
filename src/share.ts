@@ -19,15 +19,15 @@ export const getFileName = (filePath: string) => {
   return basename(filePath, extname(filePath))
 }
 
-let __moduleDeps: moduleImpoterMap = null
-export const moduleDeps = {
-  get(id: string) {
-    return __moduleDeps[id]
-  },
-  set(v: moduleImpoterMap) {
-    __moduleDeps = v
-  },
-}
+// let __moduleDeps: moduleImpoterMap = null
+// export const moduleDeps = {
+//   get(id: string) {
+//     return __moduleDeps[id]
+//   },
+//   set(v: moduleImpoterMap) {
+//     __moduleDeps = v
+//   },
+// }
 
 let __appDepMap: moduleImpoterMap = null
 export const appModuleIdChunkNamesMap = {

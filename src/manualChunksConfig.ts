@@ -2,8 +2,8 @@ import type { GetModuleInfo } from 'rollup'
 import {
   bundleName,
   chunkNameRE,
-  appRootPathRE,
-  moduleDeps,
+  // appRootPathRE,
+  // moduleDeps,
   appModuleIdChunkNamesMap,
 } from './share'
 
@@ -30,22 +30,22 @@ export function manualChunksConfig(
   opts: { getModuleInfo: GetModuleInfo }
 ) {
   const { getModuleInfo } = opts
-  const cacheIdMap = new Map<string, boolean>()
-  const nodeModuleInfo = moduleDeps.get(id)
-  const isNodeModules = !!nodeModuleInfo
+  // const cacheIdMap = new Map<string, boolean>()
+  // const nodeModuleInfo = moduleDeps.get(id)
+  // const isNodeModules = !!nodeModuleInfo
 
   // vite 用的模块，譬如：__vite-browser-external，plugin-vue:export-helper 等
-  const isInternalModule = !appRootPathRE.test(id)
-  const isThirdPackageImportByEntry =
-    isNodeModules &&
-    !isCSSRequest(id) &&
-    staticImportedByEntry(id, getModuleInfo, cacheIdMap)
-  if (isThirdPackageImportByEntry || isInternalModule) {
-    if (nodeModuleInfo && !__moduleInVenderMap.has(nodeModuleInfo.name)) {
-      __moduleInVenderMap.set(nodeModuleInfo.name, true)
-    }
-    return bundleName.vendor
-  }
+  // const isInternalModule = !appRootPathRE.test(id)
+  // const isThirdPackageImportByEntry =
+  //   isNodeModules &&
+  //   !isCSSRequest(id) &&
+  //   staticImportedByEntry(id, getModuleInfo, cacheIdMap)
+  // if (isThirdPackageImportByEntry || isInternalModule) {
+  //   if (nodeModuleInfo && !__moduleInVenderMap.has(nodeModuleInfo.name)) {
+  //     __moduleInVenderMap.set(nodeModuleInfo.name, true)
+  //   }
+  //   return bundleName.vendor
+  // }
 
   const matchedChunkName = chunkNameRE.exec(id)
   if (matchedChunkName) {
@@ -60,21 +60,21 @@ export function manualChunksConfig(
   //importers 大于 1 就存在chunk之间的引用
 
   // 处理node_modules中的依赖
-  if (nodeModuleInfo) {
-    const rootModule = [...nodeModuleInfo.chunkNames]
-    let chunkName = bundleName.main
-    switch (rootModule.length) {
-      case 1:
-        chunkName = rootModule[0]
-        break
-      default:
-        break
-    }
-    if (__moduleInVenderMap.has(chunkName)) {
-      chunkName = bundleName.vendor
-    }
-    return chunkName
-  }
+  // if (nodeModuleInfo) {
+  //   const rootModule = [...nodeModuleInfo.chunkNames]
+  //   let chunkName = bundleName.main
+  //   switch (rootModule.length) {
+  //     case 1:
+  //       chunkName = rootModule[0]
+  //       break
+  //     default:
+  //       break
+  //   }
+  //   if (__moduleInVenderMap.has(chunkName)) {
+  //     chunkName = bundleName.vendor
+  //   }
+  //   return chunkName
+  // }
 
   const appModuleInfo = appModuleIdChunkNamesMap.get(id)
   if (appModuleInfo) {
@@ -109,38 +109,38 @@ function formatChunkName(name: string) {
   return name.replace(/\./g, '/')
 }
 
-function staticImportedByEntry(
-  id: string,
-  getModuleInfo: GetModuleInfo,
-  cache: Map<string, boolean>,
-  importStack: string[] = []
-): boolean {
-  if (cache.has(id)) {
-    return cache.get(id) as boolean
-  }
-  if (importStack.includes(id)) {
-    // circular deps!
-    cache.set(id, false)
-    return false
-  }
-  const mod = getModuleInfo(id)
-  if (!mod) {
-    cache.set(id, false)
-    return false
-  }
+// function staticImportedByEntry(
+//   id: string,
+//   getModuleInfo: GetModuleInfo,
+//   cache: Map<string, boolean>,
+//   importStack: string[] = []
+// ): boolean {
+//   if (cache.has(id)) {
+//     return cache.get(id) as boolean
+//   }
+//   if (importStack.includes(id)) {
+//     // circular deps!
+//     cache.set(id, false)
+//     return false
+//   }
+//   const mod = getModuleInfo(id)
+//   if (!mod) {
+//     cache.set(id, false)
+//     return false
+//   }
 
-  if (mod.isEntry) {
-    cache.set(id, true)
-    return true
-  }
-  const someImporterIs = mod.importers.some((importer) =>
-    staticImportedByEntry(
-      importer,
-      getModuleInfo,
-      cache,
-      importStack.concat(id)
-    )
-  )
-  cache.set(id, someImporterIs)
-  return someImporterIs
-}
+//   if (mod.isEntry) {
+//     cache.set(id, true)
+//     return true
+//   }
+//   const someImporterIs = mod.importers.some((importer) =>
+//     staticImportedByEntry(
+//       importer,
+//       getModuleInfo,
+//       cache,
+//       importStack.concat(id)
+//     )
+//   )
+//   cache.set(id, someImporterIs)
+//   return someImporterIs
+// }
