@@ -1,6 +1,6 @@
 {
   "name": "@time50/vite-plugin-webpackchunkname",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "A webpackChunkName plugin for Vite.",
   "main": "dist/vite-plugin-webpackchunkname.js",
   "types": "dist/index.d.ts",

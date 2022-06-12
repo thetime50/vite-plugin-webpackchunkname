@@ -6,7 +6,7 @@ import { manualChunksConfig } from './manualChunksConfig'
 import {
   bundleName,
   CHUNK_NAME_TAG,
-  // moduleDeps,
+  moduleDeps,
   chunkNameRE,
   appRootPathRE,
   userJSFilePathRE,
@@ -17,16 +17,16 @@ import { moduleImpoterMap } from './type.d'
 
 const routeChunkNameRE = /(webpackC|c)hunkName:\s*["']([\w-/.]+)["']/
 const fileNameRE = /^[\w-.]+[\w]$/
-// const nodeModuleRE = /node_modules\/((@[^/]+\/)?[^/]+)/g
-// const getNodeModulesName = (id: string) => {
-//   let name = ''
-//   let mached = null
-//   while ((mached = nodeModuleRE.exec(id))) {
-//     name = mached[1]
-//   }
+const nodeModuleRE = /node_modules\/((@[^/]+\/)?[^/]+)/g
+const getNodeModulesName = (id: string) => {
+  let name = ''
+  let mached = null
+  while ((mached = nodeModuleRE.exec(id))) {
+    name = mached[1]
+  }
 
-//   return name
-// }
+  return name
+}
 
 // transform router content, eg:
 // import(/* webpackChunkName: "detail" */ "@/detail/somepage.vue")
@@ -35,15 +35,16 @@ const fileNameRE = /^[\w-.]+[\w]$/
 // so we can get chunkName params in manuanlChunks
 // also use chunkName: import(/* chunkName: "detail" */ "@/detail/somepage.vue")
 export const manualChunksPlugin = function (): Plugin {
-  // const nodeModuleIdSets: Set<string> = new Set()
+  const nodeModuleIdSets: Set<string> = new Set()
   const appModuleIdSets: Set<string> = new Set()
   return {
     name: 'manualNameChunksPlugin',
     apply: 'build',
     load(id) {
-      /* if (id.includes('node_modules')) {
+      if (id.includes('node_modules')) {
         nodeModuleIdSets.add(id)
-      } else  */ if (appRootPathRE.test(id)) {
+      }
+      if (appRootPathRE.test(id)) {
         appModuleIdSets.add(id)
       }
       return null
@@ -54,18 +55,18 @@ export const manualChunksPlugin = function (): Plugin {
         appModuleIdSets,
         this.getModuleInfo
       )
-      // const nodeModuleIdMap = nodeModuleId2issuerMap(
-      //   nodeModuleIdSets,
-      //   this.getModuleInfo
-      // )
-      // moduleDeps.set(nodeModuleIdMap)
+      const nodeModuleIdMap = nodeModuleId2issuerMap(
+        nodeModuleIdSets,
+        this.getModuleInfo
+      )
+      moduleDeps.set(nodeModuleIdMap)
       appModuleIdChunkNamesMap.set(appModuleIdMap)
     },
 
     transform(source, id) {
       const hasConfigRouteChunkName =
         userJSFilePathRE.test(id) && routeChunkNameRE.test(source)
-      if (hasConfigRouteChunkName) {
+      if (hasConfigRouteChunkName && !moduleDeps.get(id)) {
         let str = new MagicString(source)
         const imports = parseImports(source)[0]
         for (let index = 0; index < imports.length; index++) {
@@ -185,36 +186,36 @@ function getDynamicModuleName(moduleId: string): string {
   return fileName
 }
 
-// function nodeModuleId2issuerMap(
-//   idSets: Set<string>,
-//   getModuleInfo: GetModuleInfo
-// ) {
-//   // 获取每个id的祖先发起者
-//   const depMaps: moduleImpoterMap = {}
-//   for (const id of idSets) {
-//     if (!depMaps[id]) {
-//       const moduleName = getNodeModulesName(id)
-//       depMaps[id] = {
-//         chunkNames: new Set([moduleName]),
-//         name: moduleName,
-//       }
-//     }
-//     const { importedIds } = getModuleInfo(id)
-//     const depSets: Set<string> = new Set(importedIds)
-//     for (const importedId of depSets) {
-//       if (!depMaps[importedId]) {
-//         depMaps[importedId] = {
-//           chunkNames: new Set(),
-//           name: getNodeModulesName(importedId),
-//         }
-//       }
-//       ;[...depMaps[id].chunkNames].forEach((mid) =>
-//         depMaps[importedId].chunkNames.add(mid)
-//       )
-//       getModuleInfo(importedId).importedIds.forEach((mid: string) =>
-//         depSets.add(mid)
-//       )
-//     }
-//   }
-//   return depMaps
-// }
+function nodeModuleId2issuerMap(
+  idSets: Set<string>,
+  getModuleInfo: GetModuleInfo
+) {
+  // 获取每个id的祖先发起者
+  const depMaps: moduleImpoterMap = {}
+  for (const id of idSets) {
+    if (!depMaps[id]) {
+      const moduleName = getNodeModulesName(id)
+      depMaps[id] = {
+        chunkNames: new Set([moduleName]),
+        name: moduleName,
+      }
+    }
+    const { importedIds } = getModuleInfo(id)
+    const depSets: Set<string> = new Set(importedIds)
+    for (const importedId of depSets) {
+      if (!depMaps[importedId]) {
+        depMaps[importedId] = {
+          chunkNames: new Set(),
+          name: getNodeModulesName(importedId),
+        }
+      }
+      ;[...depMaps[id].chunkNames].forEach((mid) =>
+        depMaps[importedId].chunkNames.add(mid)
+      )
+      getModuleInfo(importedId).importedIds.forEach((mid: string) =>
+        depSets.add(mid)
+      )
+    }
+  }
+  return depMaps
+}
