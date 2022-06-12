@@ -41,9 +41,9 @@ export const manualChunksPlugin = function (): Plugin {
     name: 'manualNameChunksPlugin',
     apply: 'build',
     load(id) {
-      if (id.includes('node_modules')) {
-        // nodeModuleIdSets.add(id)
-      } else if (appRootPathRE.test(id)) {
+      /* if (id.includes('node_modules')) {
+        nodeModuleIdSets.add(id)
+      } else  */ if (appRootPathRE.test(id)) {
         appModuleIdSets.add(id)
       }
       return null

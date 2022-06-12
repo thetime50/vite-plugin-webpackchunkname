@@ -17,7 +17,7 @@ const __moduleInVenderMap = new Map<string, boolean>()
 // 此文件【不export】任何变量，所以即使部分内容发生变化，也能保证多数包能够被长效缓存
 /**
  * 打包策略（靠前优先）：
- * 1. 从入口文件引入的三方包，打包成 vendor
+ * -- 这条删除 1. 从入口文件引入的三方包，打包成 vendor --
  * 2. 路由带有 webpackChunkName 的，按给定的名称打包
  * 3. 文件有且只有一次引用，按 rollup 默认逻辑
  * 4. 文件多次引用
