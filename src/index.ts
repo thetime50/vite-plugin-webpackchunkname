@@ -66,7 +66,7 @@ export const manualChunksPlugin = function (): Plugin {
     transform(source, id) {
       const hasConfigRouteChunkName =
         userJSFilePathRE.test(id) && routeChunkNameRE.test(source)
-      if (hasConfigRouteChunkName && !moduleDeps.get(id)) {
+      if (hasConfigRouteChunkName && !nodeModuleIdSets.has(id)) {
         let str = new MagicString(source)
         const imports = parseImports(source)[0]
         for (let index = 0; index < imports.length; index++) {
